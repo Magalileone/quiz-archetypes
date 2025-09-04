@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz des Archétypes Vocaux</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .quiz-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .quiz-header h1 {
+            color: #4a5568;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .quiz-header p {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .email-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .email-section h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .email-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 100px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .question-card.active {
+            display: block;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            color: #4a5568;
+            font-size: 1.2em;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 760px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .nav-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .nav-btn.secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.3);
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .results {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .archetype-result {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .archetype-title {
+            font-size: 2em;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .archetype-percentage {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .all-scores {
+            display: grid;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .score-bar {
+            width: 60%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-left: 15px;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+        }
+
+        .archetype-icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .email-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .email-status.success {
+            background: #c6f6d5;
+            color: #276749;
+            border: 1px solid #9ae6b4;
+        }
+
+        .email-status.error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                padding-bottom: 100px;
+            }
+            
+            .quiz-header {
+                padding: 25px;
+            }
+            
+            .quiz-header h1 {
+                font-size: 2em;
+            }
+            
+            .navigation {
+                position: fixed;
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                margin-top: 0;
+                background: rgba(255, 255, 255, 0.95);
+                padding: 15px;
+                border-radius: 15px;
+                box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            }
+            
+            .question-card {
+                margin-bottom: 120px;
+                padding: 20px;
+            }
+            
+            .nav-btn {
+                flex: 1;
+                margin: 0 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz-header">
+            <h1>Quiz des Archétypes Vocaux</h1>
+            <p><strong>Quel est ton archétype vocal dominant ?</strong></p>
+            <p>À travers ce quiz, découvre ton archétype vocal : ta signature sonore unique.</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <img src="https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Mandala-Archetypes.png" 
+                     alt="Les 6 Archétypes Vocaux" 
+                     style="width: 100%; max-width: 400px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);">
+            </div>
+            
+            <p>Elle te traverse, te porte, parfois te freine. Elle peut devenir ta force.</p>
+            <p><em>Prends ton temps. Ressens. Ce voyage est le tien.</em></p>
+        </div>
+
+        <div class="email-section" id="emailSection">
+            <h3>Reçois ton archétype vocal personnalisé</h3>
+            <p>Entre ton adresse email pour recevoir immédiatement ton profil complet avec tes pourcentages pour chaque archétype et tes ressources personnalisées.</p>
+            <input type="email" id="userEmail" class="email-input" placeholder="ton@email.com" required>
+            <button class="nav-btn primary" onclick="startQuiz()">Commencer le quiz</button>
+        </div>
+
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div id="quizContainer"></div>
+
+        <div class="navigation" id="navigation" style="display: none;">
+            <button class="nav-btn secondary" id="prevBtn" onclick="previousQuestion()" disabled>Précédent</button>
+            <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()" disabled>Suivant</button>
+        </div>
+
+        <div class="results" id="results">
+            <div class="archetype-result">
+                <div class="archetype-title" id="dominantArchetype"></div>
+                <div class="archetype-percentage" id="dominantPercentage"></div>
+                <div id="archetypeDescription"></div>
+            </div>
+            
+            <h3>Ton archétype vocal :</h3>
+            <div class="all-scores" id="allScores"></div>
+            
+            <div class="email-status" id="emailStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        const ZAPIER_WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/15710016/uhkc300/';
+
+        const archetypes = {
+            racine: { 
+                name: "Voix Racine", 
+                element: "Terre", 
+                icon: "🟫",
+                image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Racine.png"
+            },
+            flamme: { 
+                name: "Voix Flamme", 
+                element: "Feu", 
+                icon: "🔥",
+                image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Flamme.png"
+            },
+            coeur: { 
+                name: "Voix du Cœur", 
+                element: "Eau", 
+                icon: "💗",
+                image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Coeur.png"
+            },
+            source: { 
+                name: "Voix Source", 
+                element: "Ether", 
+                icon: "🌊",
+                image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Source.png"
+            },
+            clarte: { 
+                name: "Voix Clarté", 
+                element: "Métal", 
+                icon: "❄️",
+                image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Clarte.png"
+            },
+            alchimique: { 
+                name: "Voix Alchimique", 
+                element: "Lumière", 
+                icon: "🌟",
+                image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Alchimique.png"
+            }
+        };
+
+        const questions = [
+            {
+                theme: "La voix",
+                text: "Quand tu t'exprimes avec ta voix, ce que tu ressens le plus souvent, c'est…",
+                options: [
+                    { text: "Une puissance profonde, stable, un peu lente à monter… mais solide une fois lancée.", archetype: "racine" },
+                    { text: "Une intensité forte, presque incontrôlable, comme une énergie qui te traverse.", archetype: "flamme" },
+                    { text: "Une précision claire, une netteté qui structure et clarifie.", archetype: "clarte" },
+                    { text: "Une douceur accueillante, comme si ta voix créait un espace rassurant.", archetype: "coeur" }
+                ]
+            },
+            {
+                theme: "La voix",
+                text: "Ta voix te met parfois en difficulté parce que…",
+                options: [
+                    { text: "Elle reste trop dans les hauteurs, difficile à ancrer dans le concret.", archetype: "source" },
+                    { text: "Tu as du mal à y mettre de l'émotion, elle peut sembler froide.", archetype: "clarte" },
+                    { text: "Elle te semble tapie au creux de ton ventre et a du mal à sortir.", archetype: "racine" },
+                    { text: "Tu n'oses pas exprimer toute ton intensité intérieure.", archetype: "flamme" }
+                ]
+            },
+            {
+                theme: "La voix",
+                text: "Ce que tu recherches profondément à travers ta voix, c'est…",
+                options: [
+                    { text: "Te connecter à une source d'inspiration authentique.", archetype: "source" },
+                    { text: "Rassembler les éléments, faire émerger une vision plus large.", archetype: "alchimique" },
+                    { text: "Transmettre ta vérité avec douceur.", archetype: "flamme" },
+                    { text: "Créer un espace d'écoute et de bienveillance.", archetype: "coeur" }
+                ]
+            },
+            {
+                theme: "La manière d'agir, de décider",
+                text: "Quand une décision importante se présente à toi…",
+                options: [
+                    { text: "Tu analyses longuement, quitte à rester bloqué·e dans la réflexion.", archetype: "clarte" },
+                    { text: "Tu ressens une évidence intérieure qui ne sait pas toujours s'exprimer clairement.", archetype: "source" },
+                    { text: "Tu passes à l'action rapidement, porté·e par ton élan.", archetype: "flamme" },
+                    { text: "Tu as besoin de sentir si c'est juste dans ton corps avant d'agir.", archetype: "racine" }
+                ]
+            },
+            {
+                theme: "La manière d'agir, de décider",
+                text: "Face à un enjeu fort, tu te connectes le plus souvent à…",
+                options: [
+                    { text: "Une énergie vitale qui te porte au-delà des peurs.", archetype: "flamme" },
+                    { text: "Ta capacité à créer du lien et sentir ce qui est juste pour les autres.", archetype: "coeur" },
+                    { text: "Ta volonté de bien faire, ce qui peut te rendre plus contrôlé·e.", archetype: "clarte" },
+                    { text: "Ton intuition claire et fluide.", archetype: "source" }
+                ]
+            },
+            {
+                theme: "La manière d'agir, de décider",
+                text: "Ce qui te bloque parfois dans l'action, c'est…",
+                options: [
+                    { text: "La peur de déranger ou de ne pas être compris·e.", archetype: "coeur" },
+                    { text: "Une inertie profonde, comme si tu devais mobiliser beaucoup d'énergie.", archetype: "racine" },
+                    { text: "Une difficulté à traduire en actes ce que tu ressens intérieurement.", archetype: "source" },
+                    { text: "Le besoin de relier tous les éléments pour que ça fasse sens.", archetype: "alchimique" }
+                ]
+            },
+            {
+                theme: "Le rapport au corps",
+                text: "Quand tu te connectes à ton corps, ce que tu ressens le plus souvent, c'est…",
+                options: [
+                    { text: "Une énergie vitale intense qui te traverse.", archetype: "flamme" },
+                    { text: "Une forme de légèreté, comme si ton corps était une antenne sensible.", archetype: "source" },
+                    { text: "Un ancrage instinctif, solide, mais parfois difficile à faire bouger.", archetype: "racine" },
+                    { text: "Une perception présente mais contrôlée, comme si tu observais chaque sensation.", archetype: "clarte" }
+                ]
+            },
+            {
+                theme: "Le rapport au corps",
+                text: "Ce que tu aimerais vivre davantage dans ton corps, c'est…",
+                options: [
+                    { text: "De la douceur et de la présence, une puissance mieux canalisée.", archetype: "flamme" },
+                    { text: "Une capacité à accueillir toutes les émotions sans te perdre.", archetype: "coeur" },
+                    { text: "Une conscience plus fine de ce qui se joue en toi.", archetype: "alchimique" },
+                    { text: "Plus d'intuition et plus de fluidité.", archetype: "racine" }
+                ]
+            },
+            {
+                theme: "Le rapport au corps",
+                text: "Si tu pouvais imaginer ta voix s'exprimer librement, tu ressentirais…",
+                options: [
+                    { text: "Un élan du cœur qui touche juste, sans forcer.", archetype: "coeur" },
+                    { text: "Une clarté fluide, comme si les mots arrivaient naturellement.", archetype: "clarte" },
+                    { text: "Un alignement entre ton souffle, ton axe et ce qui se dit.", archetype: "source" },
+                    { text: "Le besoin de transmettre quelque chose d'important et transformateur.", archetype: "alchimique" }
+                ]
+            },
+            {
+                theme: "Le lien aux autres",
+                text: "Dans une relation, ce qui est le plus naturel pour toi, c'est…",
+                options: [
+                    { text: "Être un point d'ancrage rassurant, stable, présent.", archetype: "racine" },
+                    { text: "Créer de la chaleur et de la spontanéité, parfois intensément.", archetype: "flamme" },
+                    { text: "Éclairer l'autre par ton discernement et tes conseils concrets.", archetype: "clarte" },
+                    { text: "Transformer les dynamiques par ta présence et ta vision.", archetype: "alchimique" }
+                ]
+            },
+            {
+                theme: "Le lien aux autres",
+                text: "Ce qui peut te freiner dans tes relations…",
+                options: [
+                    { text: "Ton besoin de sécurité, qui te pousse à rester dans tes repères.", archetype: "racine" },
+                    { text: "Ton exigence de qualité dans la communication.", archetype: "clarte" },
+                    { text: "Ta difficulté à poser des limites claires.", archetype: "coeur" },
+                    { text: "Ton retrait quand la relation devient trop intense émotionnellement.", archetype: "source" }
+                ]
+            },
+            {
+                theme: "Le lien aux autres",
+                text: "Tu ressens que tu es particulièrement aidant·e quand…",
+                options: [
+                    { text: "Tu écoutes en profondeur, avec une présence douce et réceptive.", archetype: "coeur" },
+                    { text: "Tu transformes les situations par ta vision globale et intégrative.", archetype: "alchimique" },
+                    { text: "Tu structures et clarifies ce qui était confus ou chaotique.", archetype: "clarte" },
+                    { text: "Tu canalises une énergie puissante au service des autres.", archetype: "flamme" }
+                ]
+            },
+            {
+                theme: "L'expression de l'intuition et du leadership",
+                text: "Quand tu dois transmettre quelque chose d'important…",
+                options: [
+                    { text: "Tu sens que tu canalises quelque chose qui te dépasse.", archetype: "alchimique" },
+                    { text: "Tu ressens une grande paix intérieure, mais doutes parfois de ta légitimité.", archetype: "racine" },
+                    { text: "Tu vibres fort, mais tu peux perdre ton ancrage.", archetype: "flamme" },
+                    { text: "Tu traduis en mots simples une réalité subtile.", archetype: "source" }
+                ]
+            },
+            {
+                theme: "L'expression de l'intuition et du leadership",
+                text: "Dans les moments de silence ou de réflexion…",
+                options: [
+                    { text: "Tu as du mal à faire taire tes pensées pour écouter ton intuition.", archetype: "clarte" },
+                    { text: "Tu ressens une bienveillance profonde, comme reliée à plus grand que toi.", archetype: "coeur" },
+                    { text: "Tu reçois des perceptions fines, mais tu n'oses pas toujours les suivre.", archetype: "source" },
+                    { text: "Tu as besoin de mettre ton expression au service d'une intention claire.", archetype: "alchimique" }
+                ]
+            },
+            {
+                theme: "L'expression de l'intuition et du leadership",
+                text: "Ton principal défi dans l'expression de ton potentiel, ce serait…",
+                options: [
+                    { text: "D'assumer pleinement ta capacité d'impact et de transformation.", archetype: "alchimique" },
+                    { text: "D'oser partager ce que tu perçois subtilement.", archetype: "source" },
+                    { text: "De faire confiance à ta force intérieure et l'exprimer pleinement.", archetype: "racine" },
+                    { text: "De rayonner sans épuiser ton énergie vitale.", archetype: "flamme" }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userEmail = '';
+        let answers = [];
+        let scores = {
+            racine: 0,
+            flamme: 0,
+            coeur: 0,
+            source: 0,
+            clarte: 0,
+            alchimique: 0
+        };
+
+        function startQuiz() {
+            const emailInput = document.getElementById('userEmail');
+            userEmail = emailInput.value.trim();
+            
+            if (!userEmail || !isValidEmail(userEmail)) {
+                alert('Merci d\'entrer une adresse email valide pour recevoir tes résultats');
+                return;
+            }
+
+            document.getElementById('emailSection').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('navigation').style.display = 'flex';
+            
+            createQuizQuestions();
+            showQuestion(0);
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function createQuizQuestions() {
+            const container = document.getElementById('quizContainer');
+            
+            for (let i = 0; i < questions.length; i++) {
+                const question = questions[i];
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                questionCard.id = 'question-' + i;
+                
+                let optionsHtml = '';
+                for (let j = 0; j < question.options.length; j++) {
+                    optionsHtml += '<div class="option" onclick="selectOption(' + i + ', ' + j + ')">' + question.options[j].text + '</div>';
+                }
+                
+                questionCard.innerHTML = '<div class="question-number">Question ' + (i + 1) + ' / ' + questions.length + ' - ' + question.theme + '</div><div class="question-text">' + question.text + '</div><div class="options" id="options-' + i + '">' + optionsHtml + '</div>';
+                
+                container.appendChild(questionCard);
+            }
+        }
+
+        function showQuestion(questionIndex) {
+            const cards = document.querySelectorAll('.question-card');
+            for (let i = 0; i < cards.length; i++) {
+                cards[i].classList.remove('active');
+            }
+            
+            const currentCard = document.getElementById('question-' + questionIndex);
+            if (currentCard) {
+                currentCard.classList.add('active');
+            }
+            
+            updateProgress();
+            updateNavigation();
+            
+            if (answers[questionIndex] !== undefined) {
+                const optionsContainer = document.getElementById('options-' + questionIndex);
+                const options = optionsContainer.querySelectorAll('.option');
+                options[answers[questionIndex]].classList.add('selected');
+                document.getElementById('nextBtn').disabled = false;
+            }
+        }
+
+        function selectOption(questionIndex, optionIndex) {
+            const optionsContainer = document.getElementById('options-' + questionIndex);
+            const options = optionsContainer.querySelectorAll('.option');
+            
+            for (let i = 0; i < options.length; i++) {
+                options[i].classList.remove('selected');
+            }
+            
+            options[optionIndex].classList.add('selected');
+            answers[questionIndex] = optionIndex;
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            } else {
+                calculateResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentQuestion === 0;
+            nextBtn.disabled = answers[currentQuestion] === undefined;
+            
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.textContent = 'Découvrir mon archétype';
+            } else {
+                nextBtn.textContent = 'Suivant';
+            }
+        }
+
+        function calculateResults() {
+            for (const key in scores) {
+                scores[key] = 0;
+            }
+            
+            for (let i = 0; i < answers.length; i++) {
+                const selectedOption = questions[i].options[answers[i]];
+                scores[selectedOption.archetype]++;
+            }
+            
+            let maxScore = 0;
+            for (const archetype in scores) {
+                if (scores[archetype] > maxScore) {
+                    maxScore = scores[archetype];
+                }
+            }
+            
+            const archetypeOrder = ['racine', 'flamme', 'coeur', 'source', 'clarte', 'alchimique'];
+            let dominantArchetype = '';
+            
+            for (let i = 0; i < archetypeOrder.length; i++) {
+                if (scores[archetypeOrder[i]] === maxScore) {
+                    dominantArchetype = archetypeOrder[i];
+                    break;
+                }
+            }
+            
+            showResults(dominantArchetype);
+            sendToZapier(dominantArchetype);
+        }
+
+        function showResults(dominantArchetype) {
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('navigation').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'none';
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            
+            const archetypeData = archetypes[dominantArchetype];
+            
+            document.getElementById('dominantArchetype').textContent = archetypeData.name;
+            document.getElementById('dominantPercentage').style.display = 'none';
+            
+            const descriptions = {
+                racine: 'Nature profonde : Ancrage, stabilité, sécurité intérieure, présence incarnée. Ta voix profonde et posée rassure et enracine.',
+                flamme: 'Nature profonde : Élan vital, désir d\'incarner, puissance expressive, courage d\'oser. Ta voix vivante et incandescente mobilise et inspire.',
+                coeur: 'Nature profonde : Relation à l\'amour, au lien, à la réceptivité. Ta profonde empathie crée une expression vocale douce et enveloppante.',
+                source: 'Nature profonde : Connexion intérieure, spiritualité, intuition. Ta voix reliée au subtil est un canal d\'inspiration profonde.',
+                clarte: 'Nature profonde : Clarté mentale, discernement, structure. Ta voix précise et posée tranche et clarifie avec discernement.',
+                alchimique: 'Nature profonde : Transformation, rayonnement, intégration. Ta voix transformatrice touche au cœur du vivant et intègre toutes les voix.'
+            };
+            
+            document.getElementById('archetypeDescription').innerHTML = 
+                '<img src="' + archetypeData.image + '" alt="' + archetypeData.name + '" style="width: 100%; max-width: 400px; height: 250px; object-fit: cover; border-radius: 15px; margin: 20px 0;">' +
+                '<p style="margin-top: 15px; font-style: italic; color: #666;">' + descriptions[dominantArchetype] + '</p>';
+            
+            document.getElementById('allScores').style.display = 'none';
+        }
+
+        async function sendToZapier(dominantArchetype) {
+            const statusDiv = document.getElementById('emailStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'email-status';
+            statusDiv.textContent = 'Envoi de ton archétype vocal en cours...';
+            
+            try {
+                const totalQuestions = questions.length;
+                
+                // Construction de l'URL avec paramètres GET
+                const params = new URLSearchParams({
+                    email: userEmail,
+                    dominant_archetype: dominantArchetype,
+                    archetype_name: archetypes[dominantArchetype].name,
+                    score_racine: scores.racine,
+                    score_flamme: scores.flamme,
+                    score_coeur: scores.coeur,
+                    score_source: scores.source,
+                    score_clarte: scores.clarte,
+                    score_alchimique: scores.alchimique,
+                    percentage_racine: Math.round((scores.racine / totalQuestions) * 100),
+                    percentage_flamme: Math.round((scores.flamme / totalQuestions) * 100),
+                    percentage_coeur: Math.round((scores.coeur / totalQuestions) * 100),
+                    percentage_source: Math.round((scores.source / totalQuestions) * 100),
+                    percentage_clarte: Math.round((scores.clarte / totalQuestions) * 100),
+                    percentage_alchimique: Math.round((scores.alchimique / totalQuestions) * 100),
+                    date_completed: new Date().toISOString()
+                });
+                
+                const zapierUrl = ZAPIER_WEBHOOK_URL + '?' + params.toString();
+                
+                console.log('ZAPIER DEBUG - Envoi via URL GET:', zapierUrl);
+                
+                // Envoi via image invisible (méthode qui contourne tous les blocages)
+                const img = new Image();
+                img.onload = () => console.log('ZAPIER - Image chargée (données envoyées)');
+                img.onerror = () => console.log('ZAPIER - Erreur image (mais données probablement envoyées)');
+                img.src = zapierUrl;
+                
+                // Test parallèle via iframe pour double envoi
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = zapierUrl;
+                document.body.appendChild(iframe);
+                setTimeout(() => document.body.removeChild(iframe), 3000);
+                
+                statusDiv.className = 'email-status success';
+                statusDiv.innerHTML = 'Ton archétype vocal a été envoyé à ' + userEmail + '!<br><small>Vérifie tes emails pour découvrir tes exercices personnalisés.</small>';
+                
+            } catch (error) {
+                console.error('ZAPIER DEBUG - Erreur complète:', error);
+                statusDiv.className = 'email-status error';
+                statusDiv.innerHTML = 'Erreur technique. Contacte-nous à <a href="mailto:contact@lavoixverssoi-cleercia.com?subject=Résultats Quiz&body=Bonjour, je viens de terminer le quiz. Mon email: ' + userEmail + '">contact@lavoixverssoi-cleercia.com</a> pour recevoir tes résultats.';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('QUIZ READY - VERSION ZAPIER FINALE');
+        });
+    </script>
+</body>
+</html>
