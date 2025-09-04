@@ -207,48 +207,6 @@
             margin-bottom: 10px;
         }
 
-        .archetype-percentage {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .all-scores {
-            display: grid;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .score-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: #f7fafc;
-            border-radius: 10px;
-        }
-
-        .score-bar {
-            width: 60%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-left: 15px;
-        }
-
-        .score-fill {
-            height: 100%;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            transition: width 0.5s ease;
-        }
-
-        .archetype-icon {
-            font-size: 1.5em;
-            margin-right: 10px;
-        }
-
         .email-status {
             margin-top: 20px;
             padding: 15px;
@@ -345,55 +303,46 @@
         <div class="results" id="results">
             <div class="archetype-result">
                 <div class="archetype-title" id="dominantArchetype"></div>
-                <div class="archetype-percentage" id="dominantPercentage"></div>
                 <div id="archetypeDescription"></div>
             </div>
-            
-            <h3>Ton archétype vocal :</h3>
-            <div class="all-scores" id="allScores"></div>
             
             <div class="email-status" id="emailStatus"></div>
         </div>
     </div>
 
     <script>
-        const ZAPIER_WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/15710016/uhkc300/';
+        // URL FORMSPREE - VOTRE URL PERSONNALISÉE
+        const FORMSPREE_URL = 'https://formspree.io/f/mldwobyk';
 
         const archetypes = {
             racine: { 
                 name: "Voix Racine", 
                 element: "Terre", 
-                icon: "🟫",
                 image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Racine.png"
             },
             flamme: { 
                 name: "Voix Flamme", 
                 element: "Feu", 
-                icon: "🔥",
                 image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Flamme.png"
             },
             coeur: { 
                 name: "Voix du Cœur", 
                 element: "Eau", 
-                icon: "💗",
                 image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Coeur.png"
             },
             source: { 
                 name: "Voix Source", 
                 element: "Ether", 
-                icon: "🌊",
                 image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Source.png"
             },
             clarte: { 
                 name: "Voix Clarté", 
                 element: "Métal", 
-                icon: "❄️",
                 image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Clarte.png"
             },
             alchimique: { 
                 name: "Voix Alchimique", 
                 element: "Lumière", 
-                icon: "🌟",
                 image: "https://github.com/Magalileone/Images-Quiz-Arch-types-vocaux/raw/main/Alchimique.png"
             }
         };
@@ -505,7 +454,7 @@
                 options: [
                     { text: "Ton besoin de sécurité, qui te pousse à rester dans tes repères.", archetype: "racine" },
                     { text: "Ton exigence de qualité dans la communication.", archetype: "clarte" },
-                    { text: "Ta difficulté à poser des limites claires.", archetype: "coeur" },
+                    { text: "Ta difficulité à poser des limites claires.", archetype: "coeur" },
                     { text: "Ton retrait quand la relation devient trop intense émotionnellement.", archetype: "source" }
                 ]
             },
@@ -703,7 +652,7 @@
             }
             
             showResults(dominantArchetype);
-            sendToZapier(dominantArchetype);
+            sendToFormspree(dominantArchetype);
         }
 
         function showResults(dominantArchetype) {
@@ -717,7 +666,6 @@
             const archetypeData = archetypes[dominantArchetype];
             
             document.getElementById('dominantArchetype').textContent = archetypeData.name;
-            document.getElementById('dominantPercentage').style.display = 'none';
             
             const descriptions = {
                 racine: 'Nature profonde : Ancrage, stabilité, sécurité intérieure, présence incarnée. Ta voix profonde et posée rassure et enracine.',
@@ -731,11 +679,9 @@
             document.getElementById('archetypeDescription').innerHTML = 
                 '<img src="' + archetypeData.image + '" alt="' + archetypeData.name + '" style="width: 100%; max-width: 400px; height: 250px; object-fit: cover; border-radius: 15px; margin: 20px 0;">' +
                 '<p style="margin-top: 15px; font-style: italic; color: #666;">' + descriptions[dominantArchetype] + '</p>';
-            
-            document.getElementById('allScores').style.display = 'none';
         }
 
-        async function sendToZapier(dominantArchetype) {
+        async function sendToFormspree(dominantArchetype) {
             const statusDiv = document.getElementById('emailStatus');
             statusDiv.style.display = 'block';
             statusDiv.className = 'email-status';
@@ -744,11 +690,9 @@
             try {
                 const totalQuestions = questions.length;
                 
-                // Construction de l'URL avec paramètres GET
-                const params = new URLSearchParams({
+                const formData = {
                     email: userEmail,
-                    dominant_archetype: dominantArchetype,
-                    archetype_name: archetypes[dominantArchetype].name,
+                    archetype: archetypes[dominantArchetype].name,
                     score_racine: scores.racine,
                     score_flamme: scores.flamme,
                     score_coeur: scores.coeur,
@@ -762,37 +706,35 @@
                     percentage_clarte: Math.round((scores.clarte / totalQuestions) * 100),
                     percentage_alchimique: Math.round((scores.alchimique / totalQuestions) * 100),
                     date_completed: new Date().toISOString()
+                };
+                
+                console.log('Envoi vers Formspree:', formData);
+                
+                const response = await fetch(FORMSPREE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
                 });
-                
-                const zapierUrl = ZAPIER_WEBHOOK_URL + '?' + params.toString();
-                
-                console.log('ZAPIER DEBUG - Envoi via URL GET:', zapierUrl);
-                
-                // Envoi via image invisible (méthode qui contourne tous les blocages)
-                const img = new Image();
-                img.onload = () => console.log('ZAPIER - Image chargée (données envoyées)');
-                img.onerror = () => console.log('ZAPIER - Erreur image (mais données probablement envoyées)');
-                img.src = zapierUrl;
-                
-                // Test parallèle via iframe pour double envoi
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = zapierUrl;
-                document.body.appendChild(iframe);
-                setTimeout(() => document.body.removeChild(iframe), 3000);
-                
-                statusDiv.className = 'email-status success';
-                statusDiv.innerHTML = 'Ton archétype vocal a été envoyé à ' + userEmail + '!<br><small>Vérifie tes emails pour découvrir tes exercices personnalisés.</small>';
+
+                if (response.ok) {
+                    console.log('Données envoyées avec succès à Formspree');
+                    statusDiv.className = 'email-status success';
+                    statusDiv.innerHTML = 'Ton archétype vocal a été envoyé avec succès !<br><small>Les données ont été collectées et tu vas être contacté.</small>';
+                } else {
+                    throw new Error('Erreur Formspree: ' + response.status);
+                }
                 
             } catch (error) {
-                console.error('ZAPIER DEBUG - Erreur complète:', error);
+                console.error('Erreur:', error);
                 statusDiv.className = 'email-status error';
                 statusDiv.innerHTML = 'Erreur technique. Contacte-nous à <a href="mailto:contact@lavoixverssoi-cleercia.com?subject=Résultats Quiz&body=Bonjour, je viens de terminer le quiz. Mon email: ' + userEmail + '">contact@lavoixverssoi-cleercia.com</a> pour recevoir tes résultats.';
             }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('QUIZ READY - VERSION ZAPIER FINALE');
+            console.log('Quiz des Archétypes Vocaux - Version Formspree');
         });
     </script>
 </body>
