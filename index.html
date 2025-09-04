@@ -721,7 +721,7 @@
                 if (response.ok) {
                     console.log('Données envoyées avec succès à Formspree');
                     statusDiv.className = 'email-status success';
-                    statusDiv.innerHTML = 'Ton archétype vocal a été envoyé avec succès !<br><small>Les données ont été collectées et tu vas être contacté.</small>';
+                    statusDiv.innerHTML = 'Ton archétype vocal a été envoyé à ' + userEmail + ' !<br><small>Vérifie tes emails pour découvrir tes exercices personnalisés.</small>';
                 } else {
                     throw new Error('Erreur Formspree: ' + response.status);
                 }
