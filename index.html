@@ -235,6 +235,69 @@
             border: 1px solid #feb2b2;
         }
 
+        /* Nouveaux styles pour la vidéo et les CTA */
+        .video-section {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .video-container {
+            margin-bottom: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .next-steps-text {
+            margin-bottom: 30px;
+            line-height: 1.8;
+            color: #555;
+            font-size: 1.1em;
+            text-align: left;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 18px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .cta-button.secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .cta-button.secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -269,6 +332,19 @@
             .nav-btn {
                 flex: 1;
                 margin: 0 5px;
+            }
+
+            .next-steps-text {
+                font-size: 1em;
+                text-align: left;
+            }
+
+            .cta-buttons {
+                max-width: 100%;
+            }
+
+            .cta-button {
+                font-size: 1em;
             }
         }
     </style>
@@ -685,8 +761,41 @@
             };
             
             document.getElementById('archetypeDescription').innerHTML = 
-                '<img src="' + archetypeData.image + '" alt="' + archetypeData.name + '" style="width: 100%; max-width: 400px; height: 250px; object-fit: cover; border-radius: 15px; margin: 20px 0;">' +
-                '<p style="margin-top: 15px; font-style: italic; color: #666;">' + descriptions[dominantArchetype] + '</p>';
+                '<div style="text-align: center; margin-bottom: 20px;">' +
+                    '<img src="' + archetypeData.image + '" alt="' + archetypeData.name + '" style="width: 100%; max-width: 400px; height: 250px; object-fit: cover; border-radius: 15px; margin: 20px auto; box-shadow: 0 15px 35px rgba(0,0,0,0.1); display: block;">' +
+                '</div>' +
+                '<p style="margin: 15px 0; font-style: italic; color: #666; text-align: center;">' + descriptions[dominantArchetype] + '</p>' +
+                
+                '<div class="video-section">' +
+                    '<div class="video-container">' +
+                        '<div style="width: 100%; height: null; position: relative; padding-top: 52.67%">' +
+                            '<iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%" allowtransparency="true" loading="lazy" src="https://adilo.bigcommand.com/watch/WVa6vajC" frameborder="0" allowfullscreen mozallowfullscreen webkitallowfullscreen oallowfullscreen msallowfullscreen scrolling="no"></iframe>' +
+                        '</div>' +
+                    '</div>' +
+                    
+                    '<div class="next-steps-text">' +
+                        '👉 Tu recevras ton résultat détaillé par email (pense à vérifier tes spams/promotions si tu ne le vois pas dans les prochaines minutes).<br><br>' +
+                        
+                        'En attendant, choisis dès maintenant ton prochain pas :<br><br>' +
+                        
+                        '<strong>Réserver mon appel découverte gratuit</strong> :<br>' +
+                        'Un temps privilégié avec moi pour explorer comment ta voix peut devenir le levier de ta transformation intérieure.<br><br>' +
+                        
+                        '<strong>Rejoindre le groupe privé Facebook :</strong><br>' +
+                        'Un espace d\'échanges, de guidances et de partages vivants, où je pourrai aussi t\'envoyer un message vocal personnalisé.<br><br>' +
+                        
+                        '🔽 Clique sur l\'option qui résonne le plus pour toi, juste en dessous.' +
+                    '</div>' +
+                    
+                    '<div class="cta-buttons">' +
+                        '<a href="https://calendly.com/contact-magalileone/appel-retour-a-soi" class="cta-button" target="_blank">' +
+                            '✨ Je réserve mon appel offert' +
+                        '</a>' +
+                        '<a href="https://www.facebook.com/groups/lavoixquiguerit/" class="cta-button secondary" target="_blank">' +
+                            '🌿 Je rejoins le groupe privé' +
+                        '</a>' +
+                    '</div>' +
+                '</div>';
         }
 
         async function sendToFormspree(dominantArchetype) {
@@ -742,9 +851,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Quiz des Archétypes Vocaux - Version Formspree');
+            console.log('Quiz des Archétypes Vocaux - Version finale avec vidéo');
         });
     </script>
 </body>
 </html>
-
